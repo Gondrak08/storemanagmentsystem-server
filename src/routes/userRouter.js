@@ -13,7 +13,6 @@ const { authenticateToken } = require('../services/authentication');
 require('dotenv').config('env')
 
 
-
 router.post('/signup', (req, res) => {
     const user = req.body;
     query = "select email, password, role, status from user where email=?";
@@ -37,8 +36,6 @@ router.post('/signup', (req, res) => {
     })
 });
 
-
-
 router.post('/login', (req, res) => {
     const user = req.body;
     query = "select email, password, role, status from user where email=?";
@@ -52,7 +49,9 @@ router.post('/login', (req, res) => {
             } else if (results[0].password == user.password) {
                 const response = { email: results[0].email, role: results[0].role };
                 const accessToken = jwt.sign(response, process.env.ACCESS_TOKEN, { expiresIn: '8h' });
-                res.status(200).json({token: accessToken, role: results[0].role });
+                res.status(200).json({token: accessToken, email:results[0].email, role: results[0].role });
+                // res.status(200).json({token:accessToken, result:results[0]});
+                // res.status(200).json({token: accessToken, role: results[0].role });
             } else {
                 return res.status(400).json({ message: "Something wen wrong. please try again later" });
             }
@@ -69,8 +68,6 @@ let transporter = nodemailer.createTransport({
         pass: process.env.PASSWORD
     }
 });
-
-
 
 router.post('/forgotPassword', (req, res) => {
     const user = req.body;
@@ -101,7 +98,6 @@ router.post('/forgotPassword', (req, res) => {
     })
 });
 
-
 router.get('/get', auth.authenticateToken, checkRole.checkRole, (req, res) => {
     // use Bearer token
     let query = "select id, name, email, status, role from user where role='user'";
@@ -110,7 +106,7 @@ router.get('/get', auth.authenticateToken, checkRole.checkRole, (req, res) => {
         else return res.status(500).json(err);
     })
 });
-
+// status update
 router.patch('/update', auth.authenticateToken, checkRole.checkRole, (req, res) => {
     const user = req.body;
     let query = "update user set status=? where id=?";
