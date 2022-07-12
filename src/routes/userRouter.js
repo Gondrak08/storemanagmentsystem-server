@@ -129,7 +129,7 @@ router.post('/changePassword', auth.authenticateToken, (req, res) => {
     const email = res.locals.email;
     let query = "select *from user where email=? and password=?";
     connection.query(query, [email, user.oldPassword], (err, results) => {
-        if (!err) {
+        if(!err){
             if (results.length <= 0) {
                 return res.status(400).json({ message: "Incorret old password" });
             }
