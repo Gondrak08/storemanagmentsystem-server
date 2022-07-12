@@ -49,7 +49,12 @@ router.post('/login', (req, res) => {
             } else if (results[0].password == user.password) {
                 const response = { email: results[0].email, role: results[0].role };
                 const accessToken = jwt.sign(response, process.env.ACCESS_TOKEN, { expiresIn: '8h' });
-                res.status(200).json({token: accessToken, email:results[0].email, role: results[0].role });
+                res.status(200).json({
+                    token: accessToken, 
+                    email:results[0].email, 
+                    password:results[0].password, 
+                    role: results[0].role
+                });
                 // res.status(200).json({token:accessToken, result:results[0]});
                 // res.status(200).json({token: accessToken, role: results[0].role });
             } else {
