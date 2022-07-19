@@ -55,8 +55,6 @@ router.post('/login', (req, res) => {
                     password:results[0].password, 
                     role: results[0].role
                 });
-                // res.status(200).json({token:accessToken, result:results[0]});
-                // res.status(200).json({token: accessToken, role: results[0].role });
             } else {
                 return res.status(400).json({ message: "Something wen wrong. please try again later" });
             }
@@ -105,7 +103,7 @@ router.post('/forgotPassword', (req, res) => {
 
 router.get('/get', auth.authenticateToken, checkRole.checkRole, (req, res) => {
     // use Bearer token
-    let query = "select id, name, email, status, role from user where role='user'";
+    let query = "select id, name, email, status, role from user where role='user' or role='manager' ";
     connection.query(query, (err, results) => {
         if (!err) return res.status(200).json(results);
         else return res.status(500).json(err);
@@ -116,6 +114,19 @@ router.patch('/update', auth.authenticateToken, checkRole.checkRole, (req, res) 
     const user = req.body;
     let query = "update user set status=? where id=?";
     connection.query(query, [user.status, user.id], (err, results) => {
+        if (!err) {
+            if (results.affectedRows == 0) return res.status(200).json({ message: "User id does not exist!" });
+            return res.status(200).json({ message: 'User updated Successfully' });
+        } else {
+            return res.status(500).json(err);
+        }
+    })
+});
+// updateRole
+router.patch('/changeRole', auth.authenticateToken, checkRole.checkRole, (req, res) => {
+    const user = req.body;
+    let query = "update user set role=? where id=?";
+    connection.query(query, [user.role, user.id], (err, results) => {
         if (!err) {
             if (results.affectedRows == 0) return res.status(200).json({ message: "User id does not exist!" });
             return res.status(200).json({ message: 'User updated Successfully' });
